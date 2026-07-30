@@ -121,20 +121,20 @@ export default function VisitorPage() {
   e.preventDefault();
 
   const { error } = await supabase.from("visitors").insert([
-    {
-      visitor_id: visitorId,
-      visitor_type: visitorType,
-      name: visitorName,
-      mobile,
-      company,
-      city: city?.value || "",
-      project_location: projectLocation,
-      branch,
-      project_type: projectType,
-      sales_executive: salesExecutive,
-      remarks,
-    },
-  ]);
+  {
+    visitor_id: visitorId,
+    visitor_type: visitorType,
+    visitor_name: visitorName,
+    mobile: mobile,
+    company_name: company,
+    branch: branch,
+    city: city?.value || "",
+    project_location: projectLocation,
+    project_type: projectType,
+    sales_executive: salesExecutive,
+    remarks: remarks,
+  },
+]);
 
   if (error) {
     alert(error.message);
