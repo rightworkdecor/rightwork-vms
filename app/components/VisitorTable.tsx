@@ -54,17 +54,17 @@ export default function VisitorTable() {
     const { error } = await supabase
       .from("visitors")
       .update({
-        name: editVisitor.name,
-        mobile: editVisitor.mobile,
-        city: editVisitor.city,
-        company: editVisitor.company,
-        branch: editVisitor.branch,
-        visitor_type: editVisitor.visitor_type,
-        project_type: editVisitor.project_type,
-        project_location: editVisitor.project_location,
-        sales_executive: editVisitor.sales_executive,
-        remarks: editVisitor.remarks,
-      })
+  visitor_name: editVisitor.visitor_name,
+  mobile: editVisitor.mobile,
+  city: editVisitor.city,
+  company_name: editVisitor.company_name,
+  branch: editVisitor.branch,
+  visitor_type: editVisitor.visitor_type,
+  project_type: editVisitor.project_type,
+  project_location: editVisitor.project_location,
+  sales_executive: editVisitor.sales_executive,
+  remarks: editVisitor.remarks,
+})
       .eq("id", editVisitor.id);
 
     if (error) {
