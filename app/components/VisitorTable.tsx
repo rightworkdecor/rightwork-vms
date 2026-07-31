@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 export default function VisitorTable() {
+
   const [visitors, setVisitors] = useState<any[]>([]);
   const [selectedVisitor, setSelectedVisitor] = useState<any>(null);
   const [editVisitor, setEditVisitor] = useState<any>(null);
@@ -69,11 +70,13 @@ export default function VisitorTable() {
     }
 
     alert("Visitor Updated Successfully");
+
     setEditVisitor(null);
     loadVisitors();
   }
 
   async function deleteVisitor(id: number) {
+
     if (!deleteEnabled) {
       alert("Delete permission disabled.");
       return;
@@ -95,7 +98,9 @@ export default function VisitorTable() {
   }
 
   function verifyOtp() {
+
     if (otp === "123456") {
+
       setDeleteEnabled(true);
       setShowOtpPopup(false);
 
@@ -104,13 +109,19 @@ export default function VisitorTable() {
       setTimeout(() => {
         setDeleteEnabled(false);
       }, 600000);
+
     } else {
+
       alert("Invalid OTP");
+
     }
+
   }
 
   const filteredVisitors = useMemo(() => {
+
     return visitors.filter((v) => {
+
       const text = search.toLowerCase();
 
       const visitorDate = new Date(v.created_at)
@@ -146,7 +157,9 @@ export default function VisitorTable() {
         matchSales &&
         matchDate
       );
+
     });
+
   }, [
     visitors,
     search,
@@ -156,7 +169,9 @@ export default function VisitorTable() {
     fromDate,
     toDate,
   ]);
+
   function exportExcel() {
+
     const data = filteredVisitors.map((v) => ({
       "Visitor ID": v.visitor_id,
       Name: v.visitor_name,
@@ -190,155 +205,287 @@ export default function VisitorTable() {
       "Visitors.xlsx"
     );
   }
-
   return (
-    <>
-      <div className="bg-white rounded-2xl shadow">
+  <>
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
 
-        {/* Header */}
+      {/* ========================= */}
+      {/* Header */}
+      {/* ========================= */}
 
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-6 border-b">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 md:p-6 border-b">
 
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
 
-            <button
-              onClick={() => setShowOtpPopup(true)}
-              className="flex items-center gap-2 bg-[#031B2E] hover:bg-[#0B4EA2] text-white px-5 py-3 rounded-xl"
-            >
-              <Shield size={18} />
-              Delete Access
-            </button>
+          <button
+            onClick={() => setShowOtpPopup(true)}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 bg-[#031B2E] hover:bg-[#0B4EA2] text-white px-5 py-3 rounded-xl"
+          >
+            <Shield size={18} />
+            Delete Access
+          </button>
 
-            {deleteEnabled && (
-              <span className="text-green-600 font-semibold">
-                Delete Enabled
-              </span>
-            )}
+          {deleteEnabled && (
+            <span className="flex items-center text-green-600 font-semibold">
+              Delete Enabled
+            </span>
+          )}
+
+        </div>
+
+        <button
+          onClick={exportExcel}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl"
+        >
+          <Download size={18} />
+          Export Excel
+        </button>
+
+      </div>
+
+      {/* ========================= */}
+      {/* Search & Filters */}
+      {/* ========================= */}
+
+      <div className="p-4 md:p-6 border-b">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <div className="relative">
+
+            <Search
+              size={18}
+              className="absolute left-3 top-3.5 text-gray-400"
+            />
+
+            <input
+              type="text"
+              placeholder="Search Visitor..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full border rounded-xl pl-10 pr-4 py-3"
+            />
 
           </div>
 
-          <button
-            onClick={exportExcel}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl"
+          <select
+            value={visitorTypeFilter}
+            onChange={(e) => setVisitorTypeFilter(e.target.value)}
+            className="border rounded-xl px-4 py-3"
           >
-            <Download size={18} />
-            Export Excel
-          </button>
+            <option value="">All Visitor Types</option>
+            <option>Customer</option>
+            <option>Dealer</option>
+            <option>Vendor</option>
+            <option>Architect</option>
+          </select>
+
+          <input
+            type="text"
+            placeholder="Branch"
+            value={branchFilter}
+            onChange={(e) => setBranchFilter(e.target.value)}
+            className="border rounded-xl px-4 py-3"
+          />
+
+          <input
+            type="text"
+            placeholder="Sales Executive"
+            value={salesFilter}
+            onChange={(e) => setSalesFilter(e.target.value)}
+            className="border rounded-xl px-4 py-3"
+          />
+
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="border rounded-xl px-4 py-3"
+          />
+
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="border rounded-xl px-4 py-3"
+          />
 
         </div>
 
-        {/* Filters */}
+      </div>
 
-        {/* Yahan tumhare filters waise hi rahenge, koi change nahi */}
+      {/* ========================= */}
+      {/* Visitor Table */}
+      {/* ========================= */}
 
-        {/* Table */}
+      <div className="overflow-x-auto">
 
-        <div className="overflow-x-auto">
+        <table className="min-w-[1100px] w-full">
 
-          <table className="min-w-full">
+          <thead className="bg-[#031B2E] text-white">
 
-            <thead className="bg-[#031B2E] text-white">
+            <tr>
 
-              <tr className="text-base">
+              <th className="px-4 py-4 text-left">Visitor ID</th>
+              <th className="px-4 py-4 text-left">Name</th>
+              <th className="px-4 py-4 text-left">Mobile</th>
+              <th className="px-4 py-4 text-left">City</th>
+              <th className="px-4 py-4 text-left">Branch</th>
+              <th className="px-4 py-4 text-left">Project Type</th>
+              <th className="px-4 py-4 text-left">Sales Executive</th>
+              <th className="px-4 py-4 text-center">Action</th>
 
-                <th className="px-4 py-4 text-left">Visitor ID</th>
-                <th className="px-4 py-4 text-left">Name</th>
-                <th className="px-4 py-4 text-left">Mobile</th>
-                <th className="px-4 py-4 text-left">City</th>
-                <th className="px-4 py-4 text-left">Branch</th>
-                <th className="px-4 py-4 text-left">Project Type</th>
-                <th className="px-4 py-4 text-left">Sales Executive</th>
-                <th className="px-4 py-4 text-center">Action</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            {filteredVisitors.map((visitor) => (
+
+              <tr
+                key={visitor.id}
+                className="border-b hover:bg-gray-50"
+              >
+
+                <td className="px-4 py-4">
+                  {visitor.visitor_id}
+                </td>
+
+                <td className="px-4 py-4 font-medium">
+                  {visitor.visitor_name}
+                </td>
+
+                <td className="px-4 py-4">
+                  {visitor.mobile}
+                </td>
+
+                <td className="px-4 py-4">
+                  {visitor.city}
+                </td>
+
+                <td className="px-4 py-4">
+                  {visitor.branch}
+                </td>
+
+                <td className="px-4 py-4">
+                  {visitor.project_type}
+                </td>
+
+                <td className="px-4 py-4">
+                  {visitor.sales_executive}
+                </td>
+
+                <td className="px-4 py-4">
+
+                  <div className="flex justify-center gap-2">
+
+                    <button
+                      onClick={() => setSelectedVisitor(visitor)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg"
+                    >
+                      <Eye size={18} />
+                    </button>
+
+                    <button
+                      onClick={() => setEditVisitor({ ...visitor })}
+                      className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg"
+                    >
+                      <Pencil size={18} />
+                    </button>
+
+                    <button
+                      disabled={!deleteEnabled}
+                      onClick={() => deleteVisitor(visitor.id)}
+                      className={`p-2 rounded-lg ${
+                        deleteEnabled
+                          ? "bg-red-600 hover:bg-red-700 text-white"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+
+                  </div>
+
+                </td>
 
               </tr>
 
-            </thead>
+            ))}
 
-            <tbody>
+          </tbody>
 
-              {filteredVisitors.map((visitor) => (
+        </table>
 
-                <tr
-                  key={visitor.id}
-                  className="border-b hover:bg-gray-50 text-base"
-                >
-
-                  <td className="px-4 py-4">
-                    {visitor.visitor_id}
-                  </td>
-
-                  <td className="px-4 py-4 font-medium">
-                    {visitor.visitor_name}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    {visitor.mobile}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    {visitor.city}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    {visitor.branch}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    {visitor.project_type}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    {visitor.sales_executive}
-                  </td>
-
-                  <td className="px-4 py-4">
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => setSelectedVisitor(visitor)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg"
-                      >
-                        <Eye size={18} />
-                      </button>
-
-                      <button
-                        onClick={() => setEditVisitor({ ...visitor })}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-lg"
-                      >
-                        <Pencil size={18} />
-                      </button>
-
-                      <button
-                        disabled={!deleteEnabled}
-                        onClick={() => deleteVisitor(visitor.id)}
-                        className={`p-2 rounded-lg ${
-                          deleteEnabled
-                            ? "bg-red-600 hover:bg-red-700 text-white"
-                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        }`}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
 
+    </div>
+    {/* ========================= */}
       {/* OTP Popup */}
-      {/* OTP Popup ka code wahi rakho jo tumhare original file me hai */}
+      {/* ========================= */}
 
-      {/* View Popup */}
+      {showOtpPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+
+          <div className="bg-white rounded-2xl w-full max-w-md p-6">
+
+            <h2 className="text-2xl font-bold mb-4">
+              Delete Access OTP
+            </h2>
+
+            <p className="text-gray-600 mb-4">
+              Enter OTP to enable delete access for 10 minutes.
+            </p>
+
+            <input
+              type="password"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="Enter OTP"
+              className="w-full border rounded-xl p-3 mb-6"
+            />
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-end">
+
+              <button
+                onClick={() => {
+                  setShowOtpPopup(false);
+                  setOtp("");
+                }}
+                className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={verifyOtp}
+                className="w-full sm:w-auto bg-[#031B2E] hover:bg-[#0B4EA2] text-white px-6 py-3 rounded-xl"
+              >
+                Verify OTP
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+      )}
+
+      {/* ========================= */}
+      {/* View Visitor Popup */}
+      {/* ========================= */}
 
       {selectedVisitor && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl w-full max-w-4xl p-8">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
 
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-3xl font-bold">Visitor Details</h2>
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto p-5 md:p-8">
+
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+
+              <h2 className="text-2xl md:text-3xl font-bold">
+                Visitor Details
+              </h2>
 
               <button
                 onClick={() => setSelectedVisitor(null)}
@@ -346,61 +493,89 @@ export default function VisitorTable() {
               >
                 Close
               </button>
+
             </div>
 
-            <div className="grid grid-cols-2 gap-5 text-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-base md:text-lg">
 
-              <p><b>Visitor ID :</b> {selectedVisitor.visitor_id}</p>
-
-              <p><b>Name :</b> {selectedVisitor.visitor_name}</p>
-
-              <p><b>Mobile :</b> {selectedVisitor.mobile}</p>
-
-              <p><b>City :</b> {selectedVisitor.city}</p>
-
-              <p><b>Visitor Type :</b> {selectedVisitor.visitor_type}</p>
-
-              <p><b>Company :</b> {selectedVisitor.company_name || "-"}</p>
-
-              <p><b>Branch :</b> {selectedVisitor.branch}</p>
-
-              <p><b>Project Type :</b> {selectedVisitor.project_type}</p>
-
-              <p className="col-span-2">
-                <b>Project Location :</b> {selectedVisitor.project_location || "-"}
+              <p>
+                <b>Visitor ID :</b> {selectedVisitor.visitor_id}
               </p>
 
-              <p><b>Sales Executive :</b> {selectedVisitor.sales_executive}</p>
+              <p>
+                <b>Name :</b> {selectedVisitor.visitor_name}
+              </p>
+
+              <p>
+                <b>Mobile :</b> {selectedVisitor.mobile}
+              </p>
+
+              <p>
+                <b>City :</b> {selectedVisitor.city}
+              </p>
+
+              <p>
+                <b>Visitor Type :</b> {selectedVisitor.visitor_type}
+              </p>
+
+              <p>
+                <b>Company :</b> {selectedVisitor.company_name || "-"}
+              </p>
+
+              <p>
+                <b>Branch :</b> {selectedVisitor.branch}
+              </p>
+
+              <p>
+                <b>Project Type :</b> {selectedVisitor.project_type}
+              </p>
+
+              <p className="md:col-span-2">
+                <b>Project Location :</b>{" "}
+                {selectedVisitor.project_location || "-"}
+              </p>
+
+              <p>
+                <b>Sales Executive :</b>{" "}
+                {selectedVisitor.sales_executive}
+              </p>
 
               <p>
                 <b>Date :</b>{" "}
-                {new Date(selectedVisitor.created_at).toLocaleString("en-IN")}
+                {new Date(
+                  selectedVisitor.created_at
+                ).toLocaleString("en-IN")}
               </p>
 
-              <p className="col-span-2">
-                <b>Remarks :</b> {selectedVisitor.remarks || "-"}
+              <p className="md:col-span-2">
+                <b>Remarks :</b>{" "}
+                {selectedVisitor.remarks || "-"}
               </p>
 
             </div>
+
           </div>
+
         </div>
       )}
-
-      {/* Edit Popup */}
+      {/* ========================= */}
+      {/* Edit Visitor Popup */}
+      {/* ========================= */}
 
       {editVisitor && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
 
-          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto p-6">
+          <div className="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] overflow-y-auto p-5 md:p-6">
 
-            <h2 className="text-3xl font-bold mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">
               Edit Visitor
             </h2>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
               <input
-                className="border rounded-lg p-3 text-lg"
+                className="border rounded-lg p-3"
+                placeholder="Visitor Name"
                 value={editVisitor.visitor_name || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -412,6 +587,7 @@ export default function VisitorTable() {
 
               <input
                 className="border rounded-lg p-3"
+                placeholder="Mobile"
                 value={editVisitor.mobile || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -423,6 +599,7 @@ export default function VisitorTable() {
 
               <input
                 className="border rounded-lg p-3"
+                placeholder="City"
                 value={editVisitor.city || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -434,6 +611,7 @@ export default function VisitorTable() {
 
               <input
                 className="border rounded-lg p-3"
+                placeholder="Company Name"
                 value={editVisitor.company_name || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -445,6 +623,7 @@ export default function VisitorTable() {
 
               <input
                 className="border rounded-lg p-3"
+                placeholder="Branch"
                 value={editVisitor.branch || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -456,6 +635,19 @@ export default function VisitorTable() {
 
               <input
                 className="border rounded-lg p-3"
+                placeholder="Visitor Type"
+                value={editVisitor.visitor_type || ""}
+                onChange={(e) =>
+                  setEditVisitor({
+                    ...editVisitor,
+                    visitor_type: e.target.value,
+                  })
+                }
+              />
+
+              <input
+                className="border rounded-lg p-3"
+                placeholder="Project Type"
                 value={editVisitor.project_type || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -467,6 +659,7 @@ export default function VisitorTable() {
 
               <input
                 className="border rounded-lg p-3"
+                placeholder="Sales Executive"
                 value={editVisitor.sales_executive || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -477,7 +670,8 @@ export default function VisitorTable() {
               />
 
               <input
-                className="border rounded-lg p-3 col-span-2"
+                className="border rounded-lg p-3 md:col-span-2"
+                placeholder="Project Location"
                 value={editVisitor.project_location || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -488,8 +682,9 @@ export default function VisitorTable() {
               />
 
               <textarea
-                rows={3}
-                className="border rounded-lg p-3 col-span-2"
+                rows={4}
+                className="border rounded-lg p-3 md:col-span-2"
+                placeholder="Remarks"
                 value={editVisitor.remarks || ""}
                 onChange={(e) =>
                   setEditVisitor({
@@ -501,18 +696,18 @@ export default function VisitorTable() {
 
             </div>
 
-            <div className="sticky bottom-0 bg-white pt-4 flex justify-end gap-4">
+            <div className="sticky bottom-0 bg-white pt-6 mt-6 flex flex-col sm:flex-row justify-end gap-4">
 
               <button
                 onClick={() => setEditVisitor(null)}
-                className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg"
+                className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg"
               >
                 Cancel
               </button>
 
               <button
                 onClick={updateVisitor}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
+                className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
               >
                 Update Visitor
               </button>
@@ -520,8 +715,10 @@ export default function VisitorTable() {
             </div>
 
           </div>
+
         </div>
       )}
+
     </>
   );
 }

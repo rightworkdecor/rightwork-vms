@@ -1,5 +1,5 @@
 "use client";
-
+import Sidebar from "../../components/Sidebar";
 import { supabase } from "@/app/lib/supabase";
 import { useEffect, useState } from "react";
 import StatsCard from "../../components/StatsCard";
@@ -59,16 +59,15 @@ loadVisitors();
   return (
     <div className="flex min-h-screen bg-gray-100">
 
-      {/* Sidebar */}
+  <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex-1">
+  <div className="flex-1 lg:ml-72 p-3 sm:p-4 md:p-6 lg:p-8 overflow-x-hidden">
 
         {/* Header */}
         {/* Header */}
-<div className="flex items-center justify-between mb-3">
+<div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
   <div>
-    <h1 className="text-3xl font-bold text-gray-800">
+    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800">
       Dashboard
     </h1>
     <p className="text-gray-500 mt-1">
@@ -95,7 +94,7 @@ loadVisitors();
         <div className="px-2 pt-2 pb-6 space-y-5">
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
 
             <StatsCard
               title="Total Visitors"
@@ -149,7 +148,7 @@ loadVisitors();
 
           {/* Charts */}
 
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 xg:grid-cols-2 gap-6">
 
             <div className="bg-white rounded-2xl shadow p-6">
               <h2 className="text-xl font-bold mb-4">
@@ -171,7 +170,7 @@ loadVisitors();
 
           {/* Visitor Table */}
 
-          <div className="bg-white rounded-2xl shadow p-6">
+          <div className="bg-white rounded-2xl shadow p-6 overflow-x-auto">
 
             <h2 className="text-xl font-bold mb-4">
               Recent Visitors
