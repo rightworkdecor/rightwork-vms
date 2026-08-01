@@ -9,9 +9,9 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-gray-100">
       <Sidebar />
-      <main className="lg:ml-[200px] p-4 md:p-6">
-        {children}
-      </main>
+      <main className="p-4 md:p-6 lg:ml-[200px]">
+  {children}
+</main>
     </div>
   );
 }
