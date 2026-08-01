@@ -49,7 +49,7 @@ export default function Sidebar() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-[#031B2E] text-white p-2 rounded-lg shadow-lg"
+        className="lg:hidden fixed top-4 right-4 z-50 bg-[#031B2E] text-white p-2 rounded-lg shadow-lg"
       >
         <Menu size={24} />
       </button>
@@ -64,11 +64,10 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-screen w-[200px] bg-[#031B2E] text-white flex flex-col
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#031B2E] text-white flex flex-col
         transform transition-transform duration-300
-        ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } lg:translate-x-0`}
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        lg:translate-x-0`}
       >
         {/* Mobile Close */}
         <div className="lg:hidden flex justify-end p-4">
@@ -87,7 +86,7 @@ export default function Sidebar() {
         </div>
 
         {/* Menu */}
-        <nav className="flex-1 p-5 space-y-3">
+        <nav className="flex-1 overflow-y-auto p-5 space-y-3">
           {menus.map((item) => {
             const Icon = item.icon;
 
@@ -109,25 +108,28 @@ export default function Sidebar() {
           })}
         </nav>
 
-        {/* Logout */}
-        <div className="p-5 border-t border-white/10">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-600 transition"
-          >
-            <LogOut size={20} />
-            <span>Logout</span>
-          </button>
-        </div>
+        {/* Bottom Section */}
+        <div className="mt-auto">
+          {/* Logout */}
+          <div className="p-5 border-t border-white/10">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-600 transition"
+            >
+              <LogOut size={20} />
+              <span>Logout</span>
+            </button>
+          </div>
 
-        {/* Footer */}
-        <div className="p-5 border-t border-white/10 text-center">
-          <p className="text-sm text-gray-300 font-medium">
-            Right Work Decor India Pvt. Ltd.
-          </p>
-          <p className="text-xs text-gray-500 mt-1">
-            © 2026 All Rights Reserved
-          </p>
+          {/* Footer */}
+          <div className="p-5 border-t border-white/10 text-center">
+            <p className="text-sm text-gray-300 font-medium">
+              Right Work Decor India Pvt. Ltd.
+            </p>
+            <p className="text-xs text-gray-500 mt-1">
+              © 2026 All Rights Reserved
+            </p>
+          </div>
         </div>
       </aside>
     </>
