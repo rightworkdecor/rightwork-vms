@@ -94,6 +94,8 @@ export default function VisitorPage() {
   message: "",
 });
 
+const [saving, setSaving] = useState(false);
+
   async function generateVisitorId() {
     const { data } = await supabase
       .from("visitors")
@@ -126,51 +128,60 @@ export default function VisitorPage() {
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  const { error } = await supabase.from("visitors").insert([
-  {
-    visitor_id: visitorId,
-    visitor_type: visitorType,
-    visitor_name: visitorName,
-    mobile: mobile,
-    company_name: company,
-    branch: branch,
-    city: city?.value || "",
-    project_location: projectLocation,
-    project_type: projectType,
-    sales_executive: salesExecutive,
-    remarks: remarks,
-  },
-]);
+  if (saving) return;
 
-  if (error) {
-  setPopup({
-    open: true,
-    type: "error",
-    title: "Save Failed",
-    message: error.message,
-  });
-  return;
-}
+  setSaving(true);
 
-  setPopup({
-  open: true,
-  type: "success",
-  title: "Success",
-  message: "Visitor Entry Saved Successfully",
-});
+  try {
+    const { error } = await supabase
+      .from("visitors")
+      .insert([
+        {
+          visitor_id: visitorId,
+          visitor_type: visitorType,
+          visitor_name: visitorName,
+          mobile,
+          company_name: company,
+          branch,
+          city: city?.value || "",
+          project_location: projectLocation,
+          project_type: projectType,
+          sales_executive: salesExecutive,
+          remarks,
+        },
+      ]);
 
-  setVisitorType("");
-  setProjectType("");
-  setBranch("");
-  setVisitorName("");
-  setMobile("");
-  setCompany("");
-  setCity(null);
-  setProjectLocation("");
-  setSalesExecutive("");
-  setRemarks("");
+    if (error) throw error;
 
-  await generateVisitorId();
+    setPopup({
+      open: true,
+      type: "success",
+      title: "Success",
+      message: "Visitor Entry Saved Successfully",
+    });
+
+    setVisitorType("");
+    setProjectType("");
+    setBranch("");
+    setVisitorName("");
+    setMobile("");
+    setCompany("");
+    setCity(null);
+    setProjectLocation("");
+    setSalesExecutive("");
+    setRemarks("");
+
+    await generateVisitorId();
+  } catch (error: any) {
+    setPopup({
+      open: true,
+      type: "error",
+      title: "Save Failed",
+      message: error.message || "Something went wrong",
+    });
+  } finally {
+    setSaving(false);
+  }
 };
 return (
   <div className="min-h-screen bg-gray-100">
@@ -614,11 +625,16 @@ return (
   </button>
 
   <button
-    type="submit"
-    className="flex-1 bg-yellow-500 text-white rounded-xl py-4 font-semibold hover:bg-yellow-600"
-  >
-    Submit Visitor Entry
-  </button>
+  type="submit"
+  disabled={saving}
+  className={`flex-1 rounded-xl py-4 font-semibold text-white transition ${
+    saving
+      ? "bg-gray-400 cursor-not-allowed"
+      : "bg-yellow-500 hover:bg-yellow-600"
+  }`}
+>
+  {saving ? "Saving..." : "Submit Visitor Entry"}
+</button>
 
 </div>
 
