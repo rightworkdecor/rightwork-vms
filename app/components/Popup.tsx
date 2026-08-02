@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { CheckCircle2, XCircle, AlertTriangle, Info, X } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Info,
+  X,
+} from "lucide-react";
 
 interface PopupProps {
   open: boolean;
@@ -18,18 +24,17 @@ export default function Popup({
   message,
   onClose,
 }: PopupProps) {
-    useEffect(() => {
-  if (!open) return;
 
-  // Sirf Success aur Info popup auto close honge
-  if (type !== "success" && type !== "info") return;
+  useEffect(() => {
+    if (!open) return;
 
-  const timer = setTimeout(() => {
-    onClose();
-  }, 2000);
+    const timer = setTimeout(() => {
+      onClose();
+    }, 2000);
 
-  return () => clearTimeout(timer);
-}, [open, type, onClose]);
+    return () => clearTimeout(timer);
+  }, [open, onClose]);
+
   if (!open) return null;
 
   const config = {
@@ -62,21 +67,19 @@ export default function Popup({
   const style = config[type];
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
 
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-[zoom_0.25s_ease]">
+      <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden animate-popup">
 
-        {/* Header */}
+        {/* Close */}
 
         <div className="flex justify-end p-4">
-
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-red-600"
+            className="text-gray-500 hover:text-red-600 transition"
           >
             <X size={24} />
           </button>
-
         </div>
 
         {/* Icon */}
@@ -99,7 +102,7 @@ export default function Popup({
             {title}
           </h2>
 
-          <p className="text-gray-500 mt-3 leading-7">
+          <p className="mt-3 text-gray-500 leading-7">
             {message}
           </p>
 
@@ -121,12 +124,17 @@ export default function Popup({
       </div>
 
       <style jsx>{`
-        @keyframes zoom {
-          from {
+        .animate-popup {
+          animation: popup 0.25s ease;
+        }
+
+        @keyframes popup {
+          0% {
             opacity: 0;
-            transform: scale(0.8);
+            transform: scale(0.85);
           }
-          to {
+
+          100% {
             opacity: 1;
             transform: scale(1);
           }

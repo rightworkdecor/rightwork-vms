@@ -487,6 +487,9 @@ const filteredVisitors = useMemo(() => {
   fromDate,
   toDate,
 ]);
+useEffect(() => {
+  console.log("Popup Open:", popup.open);
+}, [popup.open]);
 
 // ==========================
 // RETURN
@@ -1659,10 +1662,10 @@ return (
   title={popup.title}
   message={popup.message}
   onClose={() =>
-    setPopup({
-      ...popup,
+    setPopup((prev) => ({
+      ...prev,
       open: false,
-    })
+    }))
   }
 />
 
