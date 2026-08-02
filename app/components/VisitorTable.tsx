@@ -90,6 +90,9 @@ export default function VisitorTable() {
   message: "",
 });
 
+const [showDeletePopup, setShowDeletePopup] = useState(false);
+const [deleteId, setDeleteId] = useState<number | null>(null);
+
   // ==========================
   // PAGE LOAD
   // ==========================
@@ -130,7 +133,12 @@ const { data: branchData, error: branchError } = await supabase
   .select("*");
 
 if (branchError) {
-  alert(branchError.message);
+  setPopup({
+  open: true,
+  type: "error",
+  title: "Branch Error",
+  message: branchError.message,
+});
 } else {
   const branchList = branchData.map((b) => b.branch_name);
   setBranches(branchList);
@@ -142,7 +150,12 @@ const { data: employeeData, error: employeeError } = await supabase
   .select("*");
 
 if (employeeError) {
-  alert(employeeError.message);
+  setPopup({
+  open: true,
+  type: "error",
+  title: "Employee Error",
+  message: employeeError.message,
+});
 } else {
   const employeeList = employeeData.map((e) => e.employee_name);
   setEmployees(employeeList);
@@ -189,9 +202,14 @@ async function updateVisitor() {
     .eq("id", editVisitor.id);
 
   if (error) {
-    alert(error.message);
-    return;
-  }
+  setPopup({
+    open: true,
+    type: "error",
+    title: "Update Failed",
+    message: error.message,
+  });
+  return;
+}
 
   setPopup({
   open: true,
@@ -212,45 +230,49 @@ async function deleteVisitor(id: number) {
 
   if (!deleteEnabled) {
     setPopup({
-  open: true,
-  type: "warning",
-  title: "Permission Denied",
-  message: "Delete Permission Disabled",
-});
+      open: true,
+      type: "warning",
+      title: "Permission Denied",
+      message: "Delete Permission Disabled",
+    });
     return;
   }
 
-  const confirmDelete = window.confirm(
-  "Are you sure you want to delete this visitor?"
-);
+  setDeleteId(id);
+  setShowDeletePopup(true);
+}
 
-if (!confirmDelete) return;
+  async function confirmDelete() {
+
+  if (!deleteId) return;
 
   const { error } = await supabase
     .from("visitors")
     .delete()
-    .eq("id", id);
+    .eq("id", deleteId);
 
   if (error) {
     setPopup({
-  open: true,
-  type: "error",
-  title: "Error",
-  message: error.message,
-});
+      open: true,
+      type: "error",
+      title: "Delete Failed",
+      message: error.message,
+    });
     return;
   }
 
+  setShowDeletePopup(false);
+  setDeleteId(null);
+
   setPopup({
-  open: true,
-  type: "success",
-  title: "Deleted",
-  message: "Visitor Deleted Successfully",
-});
+    open: true,
+    type: "success",
+    title: "Deleted",
+    message: "Visitor Deleted Successfully",
+  });
 
   loadVisitors();
 }
-
 // ==========================
 // VERIFY OTP
 // ==========================
@@ -335,6 +357,12 @@ function exportExcel() {
     new Blob([excelBuffer]),
     "Visitors.xlsx"
   );
+  setPopup({
+  open: true,
+  type: "success",
+  title: "Export Complete",
+  message: "Visitors exported successfully.",
+});
 }
 // ==========================
 // FILTERED VISITORS
@@ -466,7 +494,7 @@ const filteredVisitors = useMemo(() => {
 
 return (
   <>
-  <div className="bg-white rounded-2xl shadow">
+  <div className="bg-white rounded-2xl shadow w-full overflow-hidden">
 
   {/* ==========================
       HEADER
@@ -508,7 +536,7 @@ return (
 
   <div className="p-6 border-b">
 
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-6 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 
       {/* Search */}
 
@@ -640,9 +668,9 @@ return (
       DESKTOP TABLE
 ========================== */}
 
-<div className="hidden lg:block overflow-x-auto">
+<div className="hidden lg:block w-full">
 
-  <table className="min-w-full">
+  <table className="w-full table-auto">
 
     <thead className="bg-[#031B2E] text-white">
 
@@ -725,9 +753,9 @@ return (
               {visitor.visitor_id}
             </td>
 
-            <td className="px-4 py-4">
-              {visitor.visitor_name}
-            </td>
+            <td className="px-4 py-4 max-w-[180px] truncate">
+  {visitor.visitor_name}
+</td>
 
             <td className="px-4 py-4">
               {visitor.mobile}
@@ -751,7 +779,7 @@ return (
 
             <td className="px-4 py-4">
 
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-1">
 
                 {/* View */}
 
@@ -759,7 +787,7 @@ return (
                   onClick={() =>
                     setSelectedVisitor(visitor)
                   }
-                  className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition"
+                  className="bg-blue-600 hover:bg-blue-700 text-white p-1.5 rounded-lg"
                 >
                   <Eye size={18} />
                 </button>
@@ -1591,6 +1619,40 @@ return (
 )}
 
 </div>
+{showDeletePopup && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+    <div className="bg-white rounded-2xl p-6 w-[400px]">
+
+      <h2 className="text-2xl font-bold mb-3">
+        Delete Visitor
+      </h2>
+
+      <p className="text-gray-600 mb-6">
+        Are you sure you want to delete this visitor?
+      </p>
+
+      <div className="flex justify-end gap-3">
+
+        <button
+          onClick={() => setShowDeletePopup(false)}
+          className="px-5 py-2 bg-gray-400 text-white rounded-xl"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={confirmDelete}
+          className="px-5 py-2 bg-red-600 text-white rounded-xl"
+        >
+          Delete
+        </button>
+
+      </div>
+
+    </div>
+  </div>
+)}
+
 <Popup
   open={popup.open}
   type={popup.type as any}

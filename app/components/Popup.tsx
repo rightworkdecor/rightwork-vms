@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { CheckCircle2, XCircle, AlertTriangle, Info, X } from "lucide-react";
 
 interface PopupProps {
@@ -17,6 +18,15 @@ export default function Popup({
   message,
   onClose,
 }: PopupProps) {
+    useEffect(() => {
+  if (!open) return;
+
+  const timer = setTimeout(() => {
+    onClose();
+  }, 2000);
+
+  return () => clearTimeout(timer);
+}, [open, onClose]);
   if (!open) return null;
 
   const config = {
