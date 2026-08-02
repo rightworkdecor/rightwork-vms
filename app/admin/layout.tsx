@@ -29,15 +29,9 @@ export default function AdminLayout({
         localStorage.getItem("lastActivity") || "0"
       );
 
-      // 1 Hour = 3600000 ms
       if (Date.now() - lastActivity > 3600000) {
         localStorage.clear();
         sessionStorage.clear();
-
-        localStorage.clear();
-sessionStorage.clear();
-router.replace("/login");
-
         router.replace("/login");
       }
     }, 10000);
@@ -52,11 +46,20 @@ router.replace("/login");
   }, [router]);
 
   return (
-    <>
+    <div className="min-h-screen bg-gray-100">
       <Sidebar />
-      <main style={{ marginLeft: "200px", padding: "24px" }}>
+
+      <main
+        className="
+          w-full
+          p-4
+          sm:p-6
+          lg:ml-[200px]
+          lg:w-[calc(100%-200px)]
+        "
+      >
         {children}
       </main>
-    </>
+    </div>
   );
 }
