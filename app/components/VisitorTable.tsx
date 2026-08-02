@@ -1,5 +1,6 @@
 "use client";
 
+import Popup from "./Popup";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 
@@ -82,6 +83,13 @@ export default function VisitorTable() {
   const [otp, setOtp] =
     useState("");
 
+    const [popup, setPopup] = useState({
+  open: false,
+  type: "success",
+  title: "",
+  message: "",
+});
+
   // ==========================
   // PAGE LOAD
   // ==========================
@@ -117,24 +125,29 @@ async function loadVisitors() {
   // ==========================
   
 // Branch List
-const { data: branchData } = await supabase
+const { data: branchData, error: branchError } = await supabase
   .from("branches")
-  .select("branch_name")
-  .order("branch_name");
+  .select("*");
 
-setBranches(
-  branchData?.map((b) => b.branch_name) || []
-);
+if (branchError) {
+  alert(branchError.message);
+} else {
+  const branchList = branchData.map((b) => b.branch_name);
+  setBranches(branchList);
+}
 
 // Employee List
-const { data: employeeData } = await supabase
+const { data: employeeData, error: employeeError } = await supabase
   .from("sales_executives")
-  .select("employee_name")
-  .order("employee_name");
+  .select("*");
 
-setEmployees(
-  employeeData?.map((e) => e.employee_name) || []
-);
+if (employeeError) {
+  alert(employeeError.message);
+} else {
+  const employeeList = employeeData.map((e) => e.employee_name);
+  setEmployees(employeeList);
+}
+
 setLoading(false);
 
 }
@@ -180,7 +193,12 @@ async function updateVisitor() {
     return;
   }
 
-  alert("Visitor Updated Successfully");
+  setPopup({
+  open: true,
+  type: "success",
+  title: "Success",
+  message: "Visitor Updated Successfully",
+});
 
   setEditVisitor(null);
 
@@ -193,15 +211,20 @@ async function updateVisitor() {
 async function deleteVisitor(id: number) {
 
   if (!deleteEnabled) {
-    alert("Delete Permission Disabled");
+    setPopup({
+  open: true,
+  type: "warning",
+  title: "Permission Denied",
+  message: "Delete Permission Disabled",
+});
     return;
   }
 
   const confirmDelete = window.confirm(
-    "Are you sure you want to delete this visitor?"
-  );
+  "Are you sure you want to delete this visitor?"
+);
 
-  if (!confirmDelete) return;
+if (!confirmDelete) return;
 
   const { error } = await supabase
     .from("visitors")
@@ -209,11 +232,21 @@ async function deleteVisitor(id: number) {
     .eq("id", id);
 
   if (error) {
-    alert(error.message);
+    setPopup({
+  open: true,
+  type: "error",
+  title: "Error",
+  message: error.message,
+});
     return;
   }
 
-  alert("Visitor Deleted Successfully");
+  setPopup({
+  open: true,
+  type: "success",
+  title: "Deleted",
+  message: "Visitor Deleted Successfully",
+});
 
   loadVisitors();
 }
@@ -225,7 +258,12 @@ async function deleteVisitor(id: number) {
 function verifyOtp() {
 
   if (otp !== "123456") {
-    alert("Invalid OTP");
+    setPopup({
+  open: true,
+  type: "error",
+  title: "Invalid OTP",
+  message: "Please enter correct OTP.",
+});
     return;
   }
 
@@ -235,7 +273,12 @@ function verifyOtp() {
 
   setOtp("");
 
-  alert("Delete Access Enabled for 10 Minutes");
+  setPopup({
+  open: true,
+  type: "success",
+  title: "Access Granted",
+  message: "Delete Access Enabled for 10 Minutes",
+});
 
   setTimeout(() => {
     setDeleteEnabled(false);
@@ -477,12 +520,17 @@ return (
         />
 
         <input
-          type="text"
-          placeholder="Search Visitor..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full border rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-[#0B4EA2]"
-        />
+  type="search"
+  placeholder="Search Visitor..."
+  value={search}
+  onChange={(e) => setSearch(e.target.value)}
+  autoComplete="off"
+  autoCorrect="off"
+  autoCapitalize="off"
+  spellCheck={false}
+  name="visitor-search"
+  className="w-full border rounded-xl pl-10 pr-4 py-3 outline-none focus:ring-2 focus:ring-[#0B4EA2]"
+/>
 
       </div>
 
@@ -495,25 +543,17 @@ return (
         }
         className="border rounded-xl px-3 py-3"
       >
-        <option value="">
-          All Visitor Types
-        </option>
+        <option value="">All Visitor Types</option>
 
-        <option value="Customer">
-          Customer
-        </option>
-
-        <option value="Dealer">
-          Dealer
-        </option>
-
-        <option value="Vendor">
-          Vendor
-        </option>
-
-        <option value="Employee">
-          Employee
-        </option>
+<option value="End Customer">End Customer</option>
+<option value="Architect">Architect</option>
+<option value="Builder">Builder</option>
+<option value="Engineer">Engineer</option>
+<option value="Interior Designer">Interior Designer</option>
+<option value="Contractor">Contractor</option>
+<option value="Dealer">Dealer</option>
+<option value="Vendor">Vendor</option>
+<option value="Other">Other</option>
 
       </select>
 
@@ -698,14 +738,8 @@ return (
             </td>
 
             <td className="px-4 py-4">
-
-              <span className="inline-flex items-center bg-[#031B2E] text-white text-xs px-3 py-1 rounded-full">
-
-                {visitor.branch}
-
-              </span>
-
-            </td>
+  {visitor.branch}
+</td>
 
             <td className="px-4 py-4">
               {visitor.project_type}
@@ -817,10 +851,9 @@ return (
 
           </div>
 
-          <span className="bg-[#031B2E] text-white text-xs px-4 py-2 rounded-full whitespace-nowrap">
-            {visitor.branch}
-          </span>
-
+          <span className="text-gray-700 font-medium">
+  {visitor.branch}
+</span>
         </div>
 
         {/* Details */}
@@ -972,12 +1005,18 @@ return (
           </label>
 
           <input
-            type="password"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            placeholder="Enter 6 Digit OTP"
-            className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#0B4EA2]"
-          />
+  type="password"
+  inputMode="numeric"
+  autoComplete="one-time-code"
+  autoCorrect="off"
+  autoCapitalize="off"
+  spellCheck={false}
+  name="otp-code"
+  value={otp}
+  onChange={(e) => setOtp(e.target.value)}
+  placeholder="Enter 6 Digit OTP"
+  className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#0B4EA2]"
+/>
 
         </div>
 
@@ -1396,37 +1435,27 @@ return (
             </label>
 
             <select
-              value={editVisitor.visitor_type || ""}
-              onChange={(e)=>
-                setEditVisitor({
-                  ...editVisitor,
-                  visitor_type:e.target.value,
-                })
-              }
-              className="w-full border rounded-xl p-3"
-            >
+  value={editVisitor.visitor_type || ""}
+  onChange={(e) =>
+    setEditVisitor({
+      ...editVisitor,
+      visitor_type: e.target.value,
+    })
+  }
+  className="w-full border rounded-xl p-3"
+>
+  <option value="">Select Visitor Type</option>
 
-              <option value="">
-                Select Visitor Type
-              </option>
-
-              <option value="Customer">
-                Customer
-              </option>
-
-              <option value="Dealer">
-                Dealer
-              </option>
-
-              <option value="Vendor">
-                Vendor
-              </option>
-
-              <option value="Employee">
-                Employee
-              </option>
-
-            </select>
+  <option value="End Customer">End Customer</option>
+  <option value="Architect">Architect</option>
+  <option value="Builder">Builder</option>
+  <option value="Engineer">Engineer</option>
+  <option value="Interior Designer">Interior Designer</option>
+  <option value="Contractor">Contractor</option>
+  <option value="Dealer">Dealer</option>
+  <option value="Vendor">Vendor</option>
+  <option value="Other">Other</option>
+</select>
 
           </div>
 
@@ -1562,6 +1591,18 @@ return (
 )}
 
 </div>
+<Popup
+  open={popup.open}
+  type={popup.type as any}
+  title={popup.title}
+  message={popup.message}
+  onClose={() =>
+    setPopup({
+      ...popup,
+      open: false,
+    })
+  }
+/>
 
 </>
 );

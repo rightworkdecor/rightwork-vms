@@ -1,5 +1,5 @@
 "use client";
-
+import Popup from "@/app/components/Popup";
 import { useEffect, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 
@@ -41,6 +41,13 @@ useState(false);
 
 const [loading, setLoading] =
 useState(false);
+
+const [popup, setPopup] = useState({
+  open: false,
+  type: "success",
+  title: "",
+  message: "",
+});
 
 // ============================
 // Visitor Settings
@@ -115,11 +122,21 @@ async function saveSettings() {
     .eq("id", 1);
 
   if (error) {
-    alert(error.message);
+    setPopup({
+  open: true,
+  type: "error",
+  title: "Error",
+  message: error.message,
+});
     return;
   }
 
-  alert("Settings Saved Successfully");
+  setPopup({
+  open: true,
+  type: "success",
+  title: "Success",
+  message: "Settings Saved Successfully",
+});
 }
 
 // ============================
@@ -128,16 +145,31 @@ async function saveSettings() {
 
 function sendOtp() {
 setOtpSent(true);
-alert("OTP Sent Successfully");
+setPopup({
+  open: true,
+  type: "success",
+  title: "OTP Sent",
+  message: "OTP Sent Successfully",
+});
 }
 
 function verifyOtp() {
 
 if (otp === "123456") {
 setOtpVerified(true);
-alert("OTP Verified Successfully");
+setPopup({
+  open: true,
+  type: "success",
+  title: "Verified",
+  message: "OTP Verified Successfully",
+});
 } else {
-alert("Invalid OTP");
+setPopup({
+  open: true,
+  type: "error",
+  title: "Invalid OTP",
+  message: "Please enter correct OTP.",
+});
 }
 
 }
@@ -156,7 +188,12 @@ async function updatePassword() {
   .single();
 
 if (findError || !admin) {
-  alert("Current Password is incorrect");
+  setPopup({
+  open: true,
+  type: "error",
+  title: "Password Error",
+  message: "Current Password is incorrect",
+});
   return;
 }
 
@@ -168,11 +205,21 @@ const { error } = await supabase
   .eq("id", admin.id);
 
 if (error) {
-  alert(error.message);
+  setPopup({
+  open: true,
+  type: "error",
+  title: "Error",
+  message: error.message,
+});
   return;
 }
 
-alert("Password Updated Successfully");
+setPopup({
+  open: true,
+  type: "success",
+  title: "Success",
+  message: "Password Updated Successfully",
+});
 }
 
 // ============================
@@ -186,7 +233,12 @@ const { data, error } = await supabase
 .select("*");
 
 if (error) {
-alert(error.message);
+setPopup({
+  open: true,
+  type: "error",
+  title: "Backup Failed",
+  message: error.message,
+});
 return;
 }
 
@@ -210,7 +262,12 @@ a.click();
 
 URL.revokeObjectURL(url);
 
-alert("Backup Completed");
+setPopup({
+  open: true,
+  type: "success",
+  title: "Backup Completed",
+  message: "Database Backup Completed Successfully",
+});
 
 }
 
@@ -239,13 +296,21 @@ await supabase
 .upsert(visitors);
 
 if (error) {
-alert(error.message);
+setPopup({
+  open: true,
+  type: "error",
+  title: "Restore Failed",
+  message: error.message,
+});
 return;
 }
 
-alert(
-"Database Restored Successfully"
-);
+setPopup({
+  open: true,
+  type: "success",
+  title: "Restore Completed",
+  message: "Database Restored Successfully",
+});
 
 }
 return (
@@ -455,6 +520,20 @@ className="bg-[#031B2E] hover:bg-[#0B4EA2] text-white px-8 py-4 rounded-xl flex 
 <Save size={22} />  
 Save Settings
 
-  </button>  </div>  </div>  
+  </button>  </div>
+  
+  <Popup
+  open={popup.open}
+  type={popup.type as any}
+  title={popup.title}
+  message={popup.message}
+  onClose={() =>
+    setPopup({
+      ...popup,
+      open: false,
+    })
+  }
+/>
+  </div>  
 </div>  );
 }

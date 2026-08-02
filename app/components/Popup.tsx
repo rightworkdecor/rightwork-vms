@@ -1,0 +1,125 @@
+"use client";
+
+import { CheckCircle2, XCircle, AlertTriangle, Info, X } from "lucide-react";
+
+interface PopupProps {
+  open: boolean;
+  type: "success" | "error" | "warning" | "info";
+  title: string;
+  message: string;
+  onClose: () => void;
+}
+
+export default function Popup({
+  open,
+  type,
+  title,
+  message,
+  onClose,
+}: PopupProps) {
+  if (!open) return null;
+
+  const config = {
+    success: {
+      icon: <CheckCircle2 size={60} />,
+      bg: "bg-green-100",
+      color: "text-green-600",
+      button: "bg-green-600 hover:bg-green-700",
+    },
+    error: {
+      icon: <XCircle size={60} />,
+      bg: "bg-red-100",
+      color: "text-red-600",
+      button: "bg-red-600 hover:bg-red-700",
+    },
+    warning: {
+      icon: <AlertTriangle size={60} />,
+      bg: "bg-yellow-100",
+      color: "text-yellow-600",
+      button: "bg-yellow-500 hover:bg-yellow-600",
+    },
+    info: {
+      icon: <Info size={60} />,
+      bg: "bg-blue-100",
+      color: "text-blue-600",
+      button: "bg-blue-600 hover:bg-blue-700",
+    },
+  };
+
+  const style = config[type];
+
+  return (
+    <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+
+      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden animate-[zoom_0.25s_ease]">
+
+        {/* Header */}
+
+        <div className="flex justify-end p-4">
+
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-600"
+          >
+            <X size={24} />
+          </button>
+
+        </div>
+
+        {/* Icon */}
+
+        <div className="flex justify-center">
+
+          <div
+            className={`w-24 h-24 rounded-full flex items-center justify-center ${style.bg} ${style.color}`}
+          >
+            {style.icon}
+          </div>
+
+        </div>
+
+        {/* Title */}
+
+        <div className="px-8 mt-6 text-center">
+
+          <h2 className="text-2xl font-bold text-gray-800">
+            {title}
+          </h2>
+
+          <p className="text-gray-500 mt-3 leading-7">
+            {message}
+          </p>
+
+        </div>
+
+        {/* Button */}
+
+        <div className="p-8">
+
+          <button
+            onClick={onClose}
+            className={`w-full py-3 rounded-xl text-white font-semibold transition ${style.button}`}
+          >
+            Continue
+          </button>
+
+        </div>
+
+      </div>
+
+      <style jsx>{`
+        @keyframes zoom {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+      `}</style>
+
+    </div>
+  );
+}

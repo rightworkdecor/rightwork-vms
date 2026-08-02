@@ -1,5 +1,5 @@
 "use client";
-
+import Popup from "@/app/components/Popup";
 import { supabase } from "@/app/lib/supabase";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
@@ -87,6 +87,12 @@ export default function VisitorPage() {
   const [remarks, setRemarks] = useState("");
 
   const [visitorId, setVisitorId] = useState("RWD-0001");
+  const [popup, setPopup] = useState({
+  open: false,
+  type: "success",
+  title: "",
+  message: "",
+});
 
   async function generateVisitorId() {
     const { data } = await supabase
@@ -137,11 +143,21 @@ export default function VisitorPage() {
 ]);
 
   if (error) {
-    alert(error.message);
-    return;
-  }
+  setPopup({
+    open: true,
+    type: "error",
+    title: "Save Failed",
+    message: error.message,
+  });
+  return;
+}
 
-  alert("Visitor Entry Saved Successfully");
+  setPopup({
+  open: true,
+  type: "success",
+  title: "Success",
+  message: "Visitor Entry Saved Successfully",
+});
 
   setVisitorType("");
   setProjectType("");
@@ -610,6 +626,19 @@ return (
 
       </div>
     </div>
+    <Popup
+  open={popup.open}
+  type={popup.type as any}
+  title={popup.title}
+  message={popup.message}
+  onClose={() =>
+    setPopup({
+      ...popup,
+      open: false,
+    })
+  }
+/>
   </div>
+  
 );
 }

@@ -1,5 +1,5 @@
 "use client";
-
+import Popup from "@/app/components/Popup";
 import { useState, useEffect } from "react";
 import { Mail, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import Image from "next/image";
@@ -19,6 +19,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [remember, setRemember] = useState(true);
+  const [popup, setPopup] = useState({
+  open: false,
+  type: "success",
+  title: "",
+  message: "",
+});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,12 +37,24 @@ export default function LoginPage() {
       .single();
 
     if (error || !data) {
-      alert("Invalid User ID or Password");
+      setPopup({
+  open: true,
+  type: "error",
+  title: "Login Failed",
+  message: "Invalid User ID or Password",
+});
+return;
       return;
     }
 
     if (!data.is_active) {
-      alert("Account Disabled");
+      setPopup({
+  open: true,
+  type: "warning",
+  title: "Account Disabled",
+  message: "Please contact administrator.",
+});
+return;
       return;
     }
 
@@ -48,7 +66,16 @@ export default function LoginPage() {
       localStorage.setItem("rememberUser", userId);
     }
 
-    alert("Login Successful");
+    setPopup({
+  open: true,
+  type: "success",
+  title: "Login Successful",
+  message: "Welcome to RWD TOSTEM Visitor Management System",
+});
+
+setTimeout(() => {
+  router.replace("/admin/dashboard");
+}, 1800);
 
     router.replace("/admin/dashboard");
   };
@@ -166,6 +193,18 @@ export default function LoginPage() {
         </div>
 
       </div>
+      <Popup
+  open={popup.open}
+  type={popup.type as any}
+  title={popup.title}
+  message={popup.message}
+  onClose={() =>
+    setPopup({
+      ...popup,
+      open: false,
+    })
+  }
+/>
 
     </div>
   );
