@@ -668,9 +668,9 @@ return (
       DESKTOP TABLE
 ========================== */}
 
-<div className="hidden lg:block w-full">
+<div className="hidden lg:block w-full overflow-x-auto">
 
-  <table className="w-full table-auto">
+  <table className="min-w-[1300px] w-full table-auto">
 
     <thead className="bg-[#031B2E] text-white">
 
@@ -704,9 +704,9 @@ return (
           Sales Executive
         </th>
 
-        <th className="px-4 py-4 text-center whitespace-nowrap">
-          Actions
-        </th>
+        <th className="w-40 px-4 py-4 text-center whitespace-nowrap">
+  Actions
+</th>
 
       </tr>
 
@@ -757,29 +757,29 @@ return (
   {visitor.visitor_name}
 </td>
 
-            <td className="px-4 py-4">
+            <td className="w-40 px-4 py-4">
               {visitor.mobile}
             </td>
 
-            <td className="px-4 py-4">
+            <td className="w-40 px-4 py-4">
               {visitor.city}
             </td>
 
-            <td className="px-4 py-4">
+            <td className="w-40 px-4 py-4">
   {visitor.branch}
 </td>
 
-            <td className="px-4 py-4">
+            <td className="w-40 px-4 py-4">
               {visitor.project_type}
             </td>
 
-            <td className="px-4 py-4">
+            <td className="w-40 px-4 py-4">
               {visitor.sales_executive}
             </td>
 
-            <td className="px-4 py-4">
+            <td className="w-40 px-4 py-4">
 
-              <div className="flex justify-center gap-1">
+              <div className="flex items-center justify-center gap-2 whitespace-nowrap">
 
                 {/* View */}
 
