@@ -26,16 +26,18 @@ export default function Popup({
 }: PopupProps) {
 
   useEffect(() => {
-  if (!open) return;
+    if (!open) return;
 
-  if (type === "success" || type === "info") {
-    const timer = setTimeout(() => {
-      onClose();
-    }, 2000);
+    if (type === "success" || type === "info") {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 2000);
 
-    return () => clearTimeout(timer);
-  }
-}, [open, type]);
+      return () => clearTimeout(timer);
+    }
+  }, [open, type, onClose]);
+
+  if (!open) return null;
 
   const config = {
     success: {
@@ -71,8 +73,6 @@ export default function Popup({
 
       <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden animate-popup">
 
-        {/* Close */}
-
         <div className="flex justify-end p-4">
           <button
             onClick={onClose}
@@ -82,22 +82,15 @@ export default function Popup({
           </button>
         </div>
 
-        {/* Icon */}
-
         <div className="flex justify-center">
-
           <div
             className={`w-24 h-24 rounded-full flex items-center justify-center ${style.bg} ${style.color}`}
           >
             {style.icon}
           </div>
-
         </div>
 
-        {/* Title */}
-
         <div className="px-8 mt-6 text-center">
-
           <h2 className="text-2xl font-bold text-gray-800">
             {title}
           </h2>
@@ -105,20 +98,15 @@ export default function Popup({
           <p className="mt-3 text-gray-500 leading-7">
             {message}
           </p>
-
         </div>
 
-        {/* Button */}
-
         <div className="p-8">
-
           <button
             onClick={onClose}
             className={`w-full py-3 rounded-xl text-white font-semibold transition ${style.button}`}
           >
             Continue
           </button>
-
         </div>
 
       </div>
@@ -129,12 +117,11 @@ export default function Popup({
         }
 
         @keyframes popup {
-          0% {
+          from {
             opacity: 0;
             transform: scale(0.85);
           }
-
-          100% {
+          to {
             opacity: 1;
             transform: scale(1);
           }
