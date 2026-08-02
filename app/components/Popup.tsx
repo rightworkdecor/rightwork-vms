@@ -21,12 +21,15 @@ export default function Popup({
     useEffect(() => {
   if (!open) return;
 
+  // Sirf Success aur Info popup auto close honge
+  if (type !== "success" && type !== "info") return;
+
   const timer = setTimeout(() => {
     onClose();
   }, 2000);
 
   return () => clearTimeout(timer);
-}, [open, onClose]);
+}, [open, type, onClose]);
   if (!open) return null;
 
   const config = {
