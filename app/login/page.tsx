@@ -76,8 +76,6 @@ return;
 setTimeout(() => {
   router.replace("/admin/dashboard");
 }, 1800);
-
-    router.replace("/admin/dashboard");
   };
 
   return (
