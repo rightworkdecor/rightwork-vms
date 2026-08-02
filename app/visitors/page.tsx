@@ -648,10 +648,10 @@ return (
   title={popup.title}
   message={popup.message}
   onClose={() =>
-    setPopup({
-      ...popup,
+    setPopup((prev) => ({
+      ...prev,
       open: false,
-    })
+    }))
   }
 />
   </div>

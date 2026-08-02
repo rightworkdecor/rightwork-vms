@@ -26,16 +26,16 @@ export default function Popup({
 }: PopupProps) {
 
   useEffect(() => {
-    if (!open) return;
+  if (!open) return;
 
+  if (type === "success" || type === "info") {
     const timer = setTimeout(() => {
       onClose();
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [open, onClose]);
-
-  if (!open) return null;
+  }
+}, [open, type]);
 
   const config = {
     success: {
