@@ -1,7 +1,8 @@
 "use client";
 
+console.log("VisitorTable Loaded");
+import { useEffect, useMemo, useRef, useState } from "react";
 import Popup from "./Popup";
-import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/app/lib/supabase";
 
 import * as XLSX from "xlsx";
@@ -92,6 +93,15 @@ export default function VisitorTable() {
 
 const [showDeletePopup, setShowDeletePopup] = useState(false);
 const [deleteId, setDeleteId] = useState<number | null>(null);
+
+
+// ==========================
+// UPDATE OTP
+// ==========================
+
+const [showUpdateOtpPopup, setShowUpdateOtpPopup] = useState(false);
+const [updateOtp, setUpdateOtp] = useState("");
+const updateOtpRef = useRef<HTMLInputElement>(null);
 
   // ==========================
   // PAGE LOAD
@@ -222,6 +232,33 @@ async function updateVisitor() {
 
   loadVisitors();
 }
+
+// ==========================
+// VERIFY UPDATE OTP
+// ==========================
+
+function verifyUpdateOtp() {
+
+  if (updateOtp !== "123456") {
+
+    setPopup({
+      open: true,
+      type: "error",
+      title: "Invalid OTP",
+      message: "Please enter correct OTP.",
+    });
+
+    return;
+  }
+
+  setShowUpdateOtpPopup(false);
+
+  setUpdateOtp("");
+
+  updateVisitor();
+}
+
+
 // ==========================
 // DELETE VISITOR
 // ==========================
@@ -490,6 +527,13 @@ const filteredVisitors = useMemo(() => {
 useEffect(() => {
   console.log("Popup Open:", popup.open);
 }, [popup.open]);
+useEffect(() => {
+  if (showUpdateOtpPopup) {
+    setTimeout(() => {
+      updateOtpRef.current?.focus();
+    }, 100);
+  }
+}, [showUpdateOtpPopup]);
 
 // ==========================
 // RETURN
@@ -673,41 +717,41 @@ return (
 
 <div className="hidden lg:block w-full overflow-x-auto">
 
-  <table className="min-w-[1300px] w-full table-auto">
+  <table className="w-full table-auto">
 
     <thead className="bg-[#031B2E] text-white">
 
       <tr>
 
-        <th className="px-4 py-4 text-left whitespace-nowrap">
+        <th className="px-3 py-3 text-left whitespace-nowrap">
           Visitor ID
         </th>
 
-        <th className="px-4 py-4 text-left whitespace-nowrap">
+        <th className="px-3 py-3 text-left whitespace-nowrap">
           Visitor Name
         </th>
 
-        <th className="px-4 py-4 text-left whitespace-nowrap">
+        <th className="px-3 py-3 text-left whitespace-nowrap">
           Mobile
         </th>
 
-        <th className="px-4 py-4 text-left whitespace-nowrap">
+        <th className="px-3 py-3 text-left whitespace-nowrap">
           City
         </th>
 
-        <th className="px-4 py-4 text-left whitespace-nowrap">
+        <th className="px-3 py-3 text-left whitespace-nowrap">
           Branch
         </th>
 
-        <th className="px-4 py-4 text-left whitespace-nowrap">
+        <th className="px-3 py-3 text-left whitespace-nowrap">
           Project Type
         </th>
 
-        <th className="px-4 py-4 text-left whitespace-nowrap">
+        <th className="px-3 py-3 text-left whitespace-nowrap">
           Sales Executive
         </th>
 
-        <th className="w-40 px-4 py-4 text-center whitespace-nowrap">
+        <th className="px-3 py-3">
   Actions
 </th>
 
@@ -752,35 +796,35 @@ return (
             className="border-b hover:bg-blue-50 transition"
           >
 
-            <td className="px-4 py-4 font-semibold">
+            <td className="px-3 py-3 font-semibold whitespace-nowrap">
               {visitor.visitor_id}
             </td>
 
-            <td className="px-4 py-4 max-w-[180px] truncate">
+            <td className="px-3 py-3 max-w-[140px] truncate">
   {visitor.visitor_name}
 </td>
 
-            <td className="w-40 px-4 py-4">
+            <td className="px-3 py-3 whitespace-nowrap">
               {visitor.mobile}
             </td>
 
-            <td className="w-40 px-4 py-4">
+            <td className="px-3 py-3 whitespace-nowrap">
               {visitor.city}
             </td>
 
-            <td className="w-40 px-4 py-4">
+            <td className="px-3 py-3 whitespace-nowrap">
   {visitor.branch}
 </td>
 
-            <td className="w-40 px-4 py-4">
+            <td className="px-3 py-3 whitespace-nowrap">
               {visitor.project_type}
             </td>
 
-            <td className="w-40 px-4 py-4">
+            <td className="px-3 py-3 whitespace-nowrap">
               {visitor.sales_executive}
             </td>
 
-            <td className="w-40 px-4 py-4">
+            <td className="px-3 py-3 whitespace-nowrap">
 
               <div className="flex items-center justify-center gap-2 whitespace-nowrap">
 
@@ -1301,6 +1345,70 @@ return (
   <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
 
     <div className="bg-white w-full max-w-6xl rounded-3xl shadow-2xl overflow-hidden max-h-[92vh] overflow-y-auto">
+      {showUpdateOtpPopup && (
+<div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center">
+
+<div className="bg-white rounded-3xl w-[420px] overflow-hidden shadow-2xl">
+
+<div className="bg-[#031B2E] text-white p-5">
+<h2 className="text-2xl font-bold">
+Update Visitor
+</h2>
+
+<p className="text-sm mt-1">
+Administrator OTP Required
+</p>
+</div>
+
+<div className="p-6">
+
+<label className="block mb-2 font-semibold">
+Enter OTP
+</label>
+
+<input
+ref={updateOtpRef}
+type="password"
+value={updateOtp}
+maxLength={6}
+inputMode="numeric"
+placeholder="Enter 6 Digit OTP"
+onChange={(e)=>setUpdateOtp(e.target.value)}
+onKeyDown={(e)=>{
+  if(e.key==="Enter"){
+    verifyUpdateOtp();
+  }
+}}
+className="w-full border rounded-xl p-3 focus:ring-2 focus:ring-green-500 outline-none"
+/>
+
+</div>
+
+<div className="border-t p-5 flex justify-end gap-3">
+
+<button
+onClick={()=>{
+setShowUpdateOtpPopup(false);
+setUpdateOtp("");
+}}
+className="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-xl"
+>
+Cancel
+</button>
+
+<button
+onClick={verifyUpdateOtp}
+className="bg-green-600 text-white px-5 py-2 rounded-xl"
+>
+Verify OTP
+</button>
+
+</div>
+
+</div>
+
+</div>
+)}
 
       {/* Header */}
 
@@ -1608,11 +1716,11 @@ return (
         </button>
 
         <button
-          onClick={updateVisitor}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl"
-        >
-          Update Visitor
-        </button>
+  onClick={() => setShowUpdateOtpPopup(true)}
+  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-xl"
+>
+  Update Visitor
+</button>
 
       </div>
 
